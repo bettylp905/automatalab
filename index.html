@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutómataLab · Simulador de autómatas finitos</title>
+  <style>
+    :root {
+      --bg: #f6f0ff;
+      --card: #fff;
+      --tx: #2a1b4d;
+      --mut: #6d5c8f;
+      --p: #7c3aed;
+      --pk: #ec4899;
+      --cy: #06b6d4;
+      --ok: #10b981;
+      --no: #ef4444;
+      --ln: #a78bfa;
+      --node: #ede9fe;
+      --inp: #faf7ff
+    }
+
+    [data-theme=dark] {
+      --bg: #150d2b;
+      --card: #241743;
+      --tx: #f1e9ff;
+      --mut: #b9a6e0;
+      --ln: #8b6df0;
+      --node: #33225f;
+      --inp: #1b1235
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      line-height: 1.5
+    }
+
+    header {
+      background: linear-gradient(120deg, #7c3aed, #ec4899 60%, #f59e0b);
+      color: #fff;
+      padding: 26px 16px 22px;
+      text-align: center;
+      position: relative
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      letter-spacing: .5px
+    }
+
+    header p {
+      margin: 6px auto 0;
+      max-width: 640px;
+      opacity: .95
+    }
+
+    #theme {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: 0;
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .25);
+      color: #fff;
+      font-size: 1rem
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 18px auto;
+      padding: 0 14px;
+      display: grid;
+      gap: 16px
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 6px 22px rgba(124, 58, 237, .14)
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+      color: var(--p)
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .chip {
+      border: 2px solid var(--p);
+      background: transparent;
+      color: var(--p);
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600
+    }
+
+    .chip.on {
+      background: linear-gradient(90deg, var(--p), var(--pk));
+      color: #fff;
+      border-color: transparent
+    }
+
+    .desc {
+      color: var(--mut);
+      margin: 10px 0 0
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center
+    }
+
+    input[type=text],
+    textarea {
+      border: 2px solid var(--ln);
+      background: var(--inp);
+      color: var(--tx);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: inherit;
+      font-family: ui-monospace, Consolas, monospace
+    }
+
+    input[type=text] {
+      flex: 1;
+      min-width: 160px;
+      font-size: 1.15rem;
+      letter-spacing: 2px
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(90deg, var(--p), var(--pk));
+      font-size: .95rem
+    }
+
+    .btn.alt {
+      background: linear-gradient(90deg, var(--cy), var(--p))
+    }
+
+    .btn.gr {
+      background: #8b86a3
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .btn:active {
+      transform: scale(.97)
+    }
+
+    #tape {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 4px;
+      min-height: 48px
+    }
+
+    .cell {
+      width: 42px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      font: 700 1.3rem ui-monospace, Consolas, monospace;
+      border-radius: 10px;
+      border: 2px solid var(--ln);
+      background: var(--inp)
+    }
+
+    .cell.done {
+      background: var(--cy);
+      color: #fff;
+      border-color: var(--cy)
+    }
+
+    .cell.now {
+      background: var(--pk);
+      color: #fff;
+      border-color: var(--pk);
+      transform: translateY(-4px)
+    }
+
+    .empty {
+      color: var(--mut);
+      font-style: italic
+    }
+
+    #banner {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+      display: none
+    }
+
+    #banner.ok {
+      display: block;
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    #banner.no {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: var(--inp);
+      border-radius: 14px
+    }
+
+    .nd {
+      fill: var(--node);
+      stroke: var(--p);
+      stroke-width: 2.5;
+      transition: .3s
+    }
+
+    .nd.on {
+      fill: #f472b6;
+      stroke: #be185d;
+      filter: drop-shadow(0 0 8px #ec4899)
+    }
+
+    .fin {
+      fill: none;
+      stroke: var(--p);
+      stroke-width: 2
+    }
+
+    .nt {
+      font: 700 15px system-ui, sans-serif;
+      fill: var(--tx);
+      text-anchor: middle;
+      dominant-baseline: central
+    }
+
+    .ed {
+      fill: none;
+      stroke: var(--ln);
+      stroke-width: 2;
+      transition: .3s
+    }
+
+    .ed.on {
+      stroke: var(--pk);
+      stroke-width: 3.5
+    }
+
+    .el {
+      font: 700 14px ui-monospace, Consolas, monospace;
+      fill: var(--mut);
+      text-anchor: middle;
+      dominant-baseline: central
+    }
+
+    .el.on {
+      fill: var(--pk)
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    @media(max-width:760px) {
+      .two {
+        grid-template-columns: 1fr
+      }
+
+      .cell {
+        width: 36px;
+        height: 42px
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: center
+    }
+
+    th,
+    td {
+      border: 1px solid var(--ln);
+      padding: 6px 8px;
+      font-family: ui-monospace, Consolas, monospace
+    }
+
+    th {
+      background: var(--node)
+    }
+
+    td.hl {
+      background: var(--pk);
+      color: #fff;
+      font-weight: 700
+    }
+
+    #log {
+      margin: 0;
+      padding-left: 32px;
+      max-height: 220px;
+      overflow: auto;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .9rem
+    }
+
+    #log li.cur {
+      color: var(--pk);
+      font-weight: 700
+    }
+
+    #err {
+      color: var(--no);
+      font-weight: 600;
+      min-height: 1.3em;
+      margin: 6px 0 0
+    }
+
+    footer {
+      text-align: center;
+      color: var(--mut);
+      padding: 20px 10px 30px;
+      font-size: .9rem
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <button id="theme" title="Cambiar modo claro/oscuro"> Modo oscuro</button>
+    <h1> AutómataLab</h1>
+    <p>Escribe una cadena y mira cómo el autómata finito recorre sus estados, paso a paso.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1 · Elige un autómata</h2>
+      <div class="chips" id="chips"></div>
+      <p class="desc" id="desc"></p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Escribe tu cadena</h2>
+      <div class="row">
+        <input type="text" id="w" maxlength="30" placeholder="Ej: 1101" autocomplete="off"
+          aria-label="Cadena de entrada">
+        <button class="btn gr" id="reset">↺ Reiniciar</button>
+      </div>
+      <p id="err"></p>
+      <div id="tape"></div>
+      <div class="row">
+        <button class="btn alt" id="back"> Atrás</button>
+        <button class="btn" id="next"> Paso</button>
+        <button class="btn" id="auto"> Auto</button>
+        <button class="btn gr" id="end"> Resultado</button>
+      </div>
+      <div id="banner"></div>
+    </section>
+
+    <section class="card">
+      <h2>3 · Diagrama de estados</h2>
+      <svg id="svg" viewBox="0 0 600 380" role="img" aria-label="Diagrama del autómata"></svg>
+      <p class="desc"> Estado normal(Morado) ·  Estado actual(Rosa) · Doble círculo = estado de aceptación · Flecha de entrada =
+        estado inicial</p>
+    </section>
+
+    <div class="two">
+      <section class="card">
+        <h2> Tabla de transiciones δ</h2>
+        <div id="tbl"></div>
+      </section>
+      <section class="card">
+        <h2> Bitácora de pasos</h2>
+        <ol id="log"></ol>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2> Crea tu propio autómata</h2>
+      <p class="desc" style="margin-top:0">Formato: <code>inicial: q0</code>, <code>finales: q2</code> y una transición
+        por línea <code>origen,símbolo,destino</code>. Acepta no determinismo.</p>
+      <textarea id="custom" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:8px"><button class="btn" id="load"> Cargar mi autómata</button></div>
+    </section>
+  </main>
+
+  <footer>Hecho por Beatriz Garcia Lopez con asistencia de Gemini  · Proyecto final · Tecnolochicas TC PRO</footer>
+
+  <script>
+    const PRESETS = [
+      {
+        name: 'Termina en 01', desc: 'Acepta cadenas binarias que terminan en "01". Ejemplos: 01, 1101, 0001.', txt: `inicial: q0
+finales: q2
+q0,0,q1
+q0,1,q0
+q1,0,q1
+q1,1,q2
+q2,0,q1
+q2,1,q0`},
+      {
+        name: 'Cantidad par de 0s', desc: 'Acepta cadenas binarias con un número par de ceros (incluida la cadena vacía).', txt: `inicial: q0
+finales: q0
+q0,0,q1
+q0,1,q0
+q1,0,q0
+q1,1,q1`},
+      {
+        name: 'Contiene "aba"', desc: 'Acepta cadenas sobre {a,b} que contienen la subcadena "aba". Ejemplos: aba, bbabab.', txt: `inicial: q0
+finales: q3
+q0,a,q1
+q0,b,q0
+q1,a,q1
+q1,b,q2
+q2,a,q3
+q2,b,q0
+q3,a,q3
+q3,b,q3`},
+      {
+        name: 'Expresión ab*c', desc: 'Acepta una "a", cualquier cantidad de "b" y termina en "c". Ejemplos: ac, abc, abbbc.', txt: `inicial: q0
+finales: q2
+q0,a,q1
+q1,b,q1
+q1,c,q2`},
+      {
+        name: 'NFA: termina en "ab"', desc: 'Autómata NO determinista: acepta cadenas sobre {a,b} que terminan en "ab". Verás varios estados activos a la vez.', txt: `inicial: q0
+finales: q2
+q0,a,q0
+q0,b,q0
+q0,a,q1
+q1,b,q2`}
+    ];
+
+    const $ = id => document.getElementById(id);
+    let A = null, runs = [], pos = 0, timer = null, cur = 0;
+
+    function parse(t) {
+      const L = t.split('\n').map(x => x.trim()).filter(Boolean);
+      let start = '', finals = [], trans = [];
+      for (const l of L) {
+        if (/^inicial\s*:/i.test(l)) start = l.split(':')[1].trim();
+        else if (/^finales\s*:/i.test(l)) finals = l.split(':')[1].split(',').map(x => x.trim()).filter(Boolean);
+        else {
+          const p = l.split(',').map(x => x.trim());
+          if (p.length !== 3 || !p[0] || !p[2] || p[1].length !== 1) throw new Error('Línea inválida: "' + l + '". Usa origen,símbolo,destino');
+          trans.push(p);
+        }
+      }
+      if (!start) throw new Error('Falta la línea "inicial: q0"');
+      if (!trans.length) throw new Error('Agrega al menos una transición');
+      const states = [start];
+      const add = s => {if (!states.includes(s)) states.push(s)};
+      trans.forEach(t => {add(t[0]); add(t[2])}); finals.forEach(add);
+      const alpha = [...new Set(trans.map(t => t[1]))].sort();
+      return {start, finals, trans, states, alpha};
+    }
+
+    function layout() {
+      const n = A.states.length, cx = 300, cy = 190; A.pos = {};
+      A.states.forEach((s, i) => {
+        if (n === 1) {A.pos[s] = [cx, cy]; return }
+        const a = Math.PI + 2 * Math.PI * i / n;
+        A.pos[s] = [cx + Math.min(230, 70 + n * 26) * Math.cos(a), cy + Math.min(125, 60 + n * 14) * Math.sin(a)];
+      });
+    }
+
+    function compute() {
+      const w = $('w').value;
+      runs = [new Set([A.start])];
+      for (const ch of w) {
+        const nx = new Set();
+        for (const s of runs[runs.length - 1]) for (const t of A.trans) if (t[0] === s && t[1] === ch) nx.add(t[2]);
+        runs.push(nx);
+      }
+      pos = 0;
+      const bad = [...new Set([...w].filter(c => !A.alpha.includes(c)))];
+      $('err').textContent = bad.length ? ' Símbolos fuera del alfabeto {' + A.alpha.join(', ') + '}: ' + bad.join(' ') + ' (el autómata rechazará la cadena)' : '';
+    }
+
+    function usedKeys() {
+      const u = new Set();
+      if (pos > 0) {
+        const ch = $('w').value[pos - 1];
+        for (const t of A.trans) if (runs[pos - 1].has(t[0]) && t[1] === ch) u.add(t.join('|'));
+      }
+      return u;
+    }
+
+    function drawSVG() {
+      const R = 24, c = [300, 190], used = usedKeys(), now = runs[pos];
+      const unit = (x, y) => {const l = Math.hypot(x, y) || 1; return [x / l, y / l]};
+      const groups = {};
+      A.trans.forEach(t => {
+        const k = t[0] + '|' + t[2];
+        (groups[k] = groups[k] || {f: t[0], t: t[2], s: [], on: false});
+        if (!groups[k].s.includes(t[1])) groups[k].s.push(t[1]);
+        if (used.has(t.join('|'))) groups[k].on = true;
+      });
+      let h = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#a78bfa"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#ec4899"/></marker></defs>`;
+      for (const g of Object.values(groups)) {
+        const a = A.pos[g.f], b = A.pos[g.t], m = g.on ? 'ara' : 'ar', cl = g.on ? ' on' : '', lab = g.s.join(',');
+        if (g.f === g.t) {
+          const d = unit(a[0] - c[0], a[1] - c[1]), dd = (g.f === A.start || (a[0] === c[0] && a[1] === c[1])) ? [0, -1] : d, pp = [-dd[1], dd[0]];
+          const s = [a[0] + dd[0] * R * .8 + pp[0] * R * .6, a[1] + dd[1] * R * .8 + pp[1] * R * .6], e = [a[0] + dd[0] * (R + 3) - pp[0] * R * .55, a[1] + dd[1] * (R + 3) - pp[1] * R * .55];
+          const c1 = [a[0] + dd[0] * (R + 48) + pp[0] * 30, a[1] + dd[1] * (R + 48) + pp[1] * 30], c2 = [a[0] + dd[0] * (R + 48) - pp[0] * 30, a[1] + dd[1] * (R + 48) - pp[1] * 30];
+          h += `<path class="ed${cl}" d="M${s} C${c1} ${c2} ${e}" marker-end="url(#${m})"/><text class="el${cl}" x="${a[0] + dd[0] * (R + 44)}" y="${a[1] + dd[1] * (R + 44)}">${lab}</text>`;
+        } else {
+          const rev = !!groups[g.t + '|' + g.f], k = rev ? 32 : 0, mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], v = unit(b[0] - a[0], b[1] - a[1]), pp = [-v[1], v[0]];
+          const ct = [mid[0] + pp[0] * k, mid[1] + pp[1] * k], ua = unit(ct[0] - a[0], ct[1] - a[1]), ub = unit(ct[0] - b[0], ct[1] - b[1]);
+          const s = [a[0] + ua[0] * R, a[1] + ua[1] * R], e = [b[0] + ub[0] * (R + 3), b[1] + ub[1] * (R + 3)];
+          const q = [.25 * s[0] + .5 * ct[0] + .25 * e[0], .25 * s[1] + .5 * ct[1] + .25 * e[1]], o = rev ? 14 : 13;
+          h += `<path class="ed${cl}" d="M${s} Q${ct} ${e}" marker-end="url(#${m})"/><text class="el${cl}" x="${q[0] + pp[0] * o}" y="${q[1] + pp[1] * o}">${lab}</text>`;
+        }
+      }
+      const sp = A.pos[A.start], sd = unit(sp[0] - c[0], sp[1] - c[1]), sdd = (sp[0] === c[0] && sp[1] === c[1]) ? [-1, 0] : sd;
+      h += `<line class="ed" x1="${sp[0] + sdd[0] * (R + 40)}" y1="${sp[1] + sdd[1] * (R + 40)}" x2="${sp[0] + sdd[0] * (R + 3)}" y2="${sp[1] + sdd[1] * (R + 3)}" marker-end="url(#ar)"/>`;
+      for (const s of A.states) {
+        const p = A.pos[s], on = now.has(s);
+        h += `<circle class="nd${on ? ' on' : ''}" cx="${p[0]}" cy="${p[1]}" r="${R}"/>`;
+        if (A.finals.includes(s)) h += `<circle class="fin" cx="${p[0]}" cy="${p[1]}" r="${R - 5}"/>`;
+        h += `<text class="nt" x="${p[0]}" y="${p[1]}">${s}</text>`;
+      }
+      $('svg').innerHTML = h;
+    }
+
+    function drawTape() {
+      const w = $('w').value;
+      if (!w) {$('tape').innerHTML = '<span class="empty">Cadena vacía (ε). Pulsa "Resultado" para probarla.</span>'; return }
+      $('tape').innerHTML = [...w].map((ch, i) => `<div class="cell ${i < pos - 1 ? 'done' : i === pos - 1 ? 'now' : ''}">${ch}</div>`).join('');
+    }
+
+    function drawTable() {
+      const ch = pos > 0 ? $('w').value[pos - 1] : null, prev = pos > 0 ? runs[pos - 1] : new Set();
+      let h = '<table><tr><th>δ</th>' + A.alpha.map(a => `<th>${a}</th>`).join('') + '</tr>';
+      for (const s of A.states) {
+        h += `<tr><th>${s === A.start ? '→' : ''}${A.finals.includes(s) ? '*' : ''}${s}</th>`;
+        for (const a of A.alpha) {
+          const to = A.trans.filter(t => t[0] === s && t[1] === a).map(t => t[2]);
+          h += `<td class="${prev.has(s) && a === ch ? 'hl' : ''}">${to.length ? '{' + to.join(',') + '}' : '—'}</td>`;
+        }
+        h += '</tr>';
+      }
+      $('tbl').innerHTML = h + '</table><p class="desc">→ inicial · * aceptación</p>';
+    }
+
+    function drawLog() {
+      const w = $('w').value, set = r => '{' + [...r].join(', ') + '}';
+      let h = `<li class="${pos === 0 ? 'cur' : ''}">Inicio: ${set(runs[0])}</li>`;
+      for (let i = 1; i <= pos; i++)
+        h += `<li class="${i === pos ? 'cur' : ''}">Leo "${w[i - 1]}" → ${runs[i].size ? set(runs[i]) : '∅ (sin transición)'}</li>`;
+      $('log').innerHTML = h;
+      $('log').scrollTop = $('log').scrollHeight;
+    }
+
+    function drawBanner() {
+      const b = $('banner'), n = $('w').value.length;
+      if (pos < n) {b.className = ''; b.style.display = 'none'; return }
+      b.style.display = '';
+      const ok = [...runs[n]].some(s => A.finals.includes(s));
+      b.className = ok ? 'ok' : 'no';
+      b.textContent = ok ? ' ¡Cadena ACEPTADA! Terminó en un estado de aceptación.' : ' Cadena RECHAZADA. ' + (runs[n].size ? 'Terminó en un estado que no es de aceptación.' : 'No existía transición para continuar.');
+    }
+
+    function render() {
+      const n = $('w').value.length;
+      drawSVG(); drawTape(); drawTable(); drawLog(); drawBanner();
+      $('back').disabled = pos === 0; $('next').disabled = pos >= n;
+      $('end').disabled = pos >= n;
+    }
+
+    function stopAuto() {clearInterval(timer); timer = null; $('auto').textContent = '▶ Auto'}
+    function restart() {stopAuto(); compute(); render()}
+
+    function setAutomaton(a, idx, textOverride) {
+      A = a; layout(); cur = idx;
+      document.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('on', i === idx));
+      $('desc').textContent = a.desc;
+      $('custom').value = textOverride;
+      restart();
+    }
+
+    function init() {
+      $('chips').innerHTML = PRESETS.map((p, i) => `<button class="chip" data-i="${i}">${p.name}</button>`).join('');
+      $('chips').onclick = e => {
+        const i = e.target.dataset.i; if (i === undefined) return;
+        const p = PRESETS[i], a = parse(p.txt); a.desc = p.desc;
+        setAutomaton(a, +i, p.txt);
+      };
+      $('w').oninput = restart;
+      $('w').onkeydown = e => {if (e.key === 'Enter') $('end').click()};
+      $('reset').onclick = () => {$('w').value = ''; restart(); $('w').focus()};
+      $('next').onclick = () => {if (pos < $('w').value.length) {pos++; render()} };
+      $('back').onclick = () => {stopAuto(); if (pos > 0) {pos--; render()} };
+      $('end').onclick = () => {stopAuto(); pos = $('w').value.length; render()};
+      $('auto').onclick = () => {
+        if (timer) {stopAuto(); return }
+        if (pos >= $('w').value.length) pos = 0;
+        $('auto').textContent = '⏸ Pausa'; render();
+        timer = setInterval(() => {
+          if (pos >= $('w').value.length) {stopAuto(); return }
+          pos++; render();
+          if (pos >= $('w').value.length) stopAuto();
+        }, 900);
+      };
+      $('load').onclick = () => {
+        try {
+          const txt = $('custom').value, a = parse(txt);
+          a.desc = 'Autómata personalizado (' + a.states.length + ' estados, alfabeto {' + a.alpha.join(', ') + '}).';
+          setAutomaton(a, -1, txt);
+        } catch (err) {$('err').textContent = 'Error,intentalo de nuevo ' + err.message}
+      };
+      $('theme').onclick = () => {
+        const d = document.documentElement, dark = d.dataset.theme === 'dark';
+        d.dataset.theme = dark ? '' : 'dark';
+        $('theme').textContent = dark ? ' Modo oscuro' : ' Modo claro';
+      };
+      $('chips').firstChild.click();
+      $('w').value = '1101'; restart();
+    }
+    init();
+  </script>
+</body>
+
+</html>
