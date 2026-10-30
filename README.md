@@ -49,13 +49,25 @@ Cada línea de transición es `origen,símbolo,destino`. Si repites origen y sí
 | SVG | Dibujo del diagrama de estados |
 | GitHub + GitHub Pages | Repositorio y publicación |
 
-## 💬 Prompts utilizados
+##  Prompts utilizados
 
 ### Prompt inicial (Rol, Tarea, Contexto, Restricciones)
 
-```
-PEGA AQUÍ EL PROMPT EXACTO QUE USASTE EN GEMINI
-```
+
+ROL: Actúa como un desarrollador web front-end experto en HTML, CSS y JavaScript puro, y con conocimientos sólidos de teoría de autómatas y lenguajes formales.
+TAREA: Construye un sitio web interactivo de una sola página llamado "AutómataLab" que simule autómatas finitos (DFA y NFA). El usuario escribe una cadena y el sitio muestra paso a paso cómo se recorren los estados hasta aceptar o rechazar la cadena.
+CONTEXTO: El público son estudiantes de la Licenciatura en Tecnologías y Sistemas de la Información que cursan Teoría de Autómatas y Lenguajes Formales. El sitio debe ser didáctico, muy visual y colorido (morado, rosa y cian), y debe poder demostrarse en vivo en un pitch de 2 minutos.
+RESTRICCIONES: 1) Todo en un solo archivo index.html, sin librerías externas, compatible con GitHub Pages. 2) Diagrama de estados en SVG con el estado actual resaltado, doble círculo para estados de aceptación y flecha de entrada en el estado inicial. 3) Cinta de entrada que marque el símbolo leído. 4) Botones funcionales: Paso, Atrás, Auto, Resultado y Reiniciar. 5) Tabla de transiciones y bitácora de pasos. 6) Al menos 4 autómatas de ejemplo (termina en 01, cantidad par de 0s, contiene "aba", ab*c). 7) Un cuadro para que el usuario cree su propio autómata. 8) Botón de modo oscuro y diseño responsivo para celular. 9) Código comentado en español.
+
+
+Refnamientos
+Refinamiento 1 · No determinismo
+Agrega soporte para autómatas no deterministas (NFA): si hay varias transiciones posibles, resalta todos los estados activos a la vez. Incluye un ejemplo NFA que acepte cadenas que terminan en "ab".
+Refinamiento 2 · Validación
+Si el usuario escribe símbolos que no están en el alfabeto del autómata, muestra una advertencia en rojo debajo del campo y rechaza la cadena. Muestra también un mensaje claro de ACEPTADA o RECHAZADA al final.
+Refinamiento 3 · Diseño y claridad
+Mejora el diseño para celular, agrega una bitácora que diga "Leo X → {estados}" en cada paso y resalta en la tabla de transiciones la celda que se usó. Comenta el código en español.
+
 
 
 
