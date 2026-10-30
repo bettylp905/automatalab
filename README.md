@@ -1,17 +1,17 @@
-# 🤖 AutómataLab
+#  AutómataLab
 
 Simulador interactivo de **autómatas finitos** (DFA y NFA). Escribes una cadena y ves, paso a paso, cómo el autómata recorre sus estados hasta aceptarla o rechazarla.
 
-🌐 **Sitio publicado:** https://TU-USUARIO.github.io/automatalab/
-📦 **Repositorio:** https://github.com/TU-USUARIO/automatalab
+ Sitio publicado: https://bettylp905.github.io/automatalab/
+Repositorio:** https://github.com/bettylp905/automatalab
 
-> Proyecto final · Curso *Introducción a la IA y Vibecoding* · Tecnolochicas TC PRO
+> Proyecto final · Curso Introducción a la IA y Vibecoding · Tecnolochicas TC PRO
 
 ---
 
-## 🎯 ¿De qué trata?
+##  ¿De qué trata?
 
-Aprender teoría de autómatas solo con dibujos en el pizarrón es difícil. **AutómataLab** convierte esos dibujos en algo que se puede probar:
+Aprender teoría de autómatas solo con dibujos en el pizarrón es difícil. AutómataLab convierte esos dibujos en algo que se puede probar:
 
 - Diagrama de estados animado (estado actual en rosa, transición usada resaltada).
 - Cinta de entrada que marca el símbolo que se está leyendo.
@@ -21,7 +21,7 @@ Aprender teoría de autómatas solo con dibujos en el pizarrón es difícil. **A
 - 5 autómatas de ejemplo + editor para **crear el tuyo**.
 - Modo claro / oscuro.
 
-## 🧪 Cómo usarlo
+##  Cómo usarlo
 
 1. Elige un autómata de la lista.
 2. Escribe una cadena (por ejemplo `1101`).
@@ -40,7 +40,7 @@ q1,b,q2
 
 Cada línea de transición es `origen,símbolo,destino`. Si repites origen y símbolo con destinos distintos, obtienes un autómata no determinista.
 
-## 🛠️ Herramientas
+##  Herramientas
 
 | Herramienta | Uso |
 |---|---|
@@ -57,20 +57,16 @@ Cada línea de transición es `origen,símbolo,destino`. Si repites origen y sí
 PEGA AQUÍ EL PROMPT EXACTO QUE USASTE EN GEMINI
 ```
 
-### Refinamientos
 
-1. `PEGA AQUÍ EL PROMPT DE REFINAMIENTO 1`
-2. `PEGA AQUÍ EL PROMPT DE REFINAMIENTO 2`
-3. `PEGA AQUÍ EL PROMPT DE REFINAMIENTO 3`
 
-## 🐞 Errores encontrados y cómo se corrigieron
+##  Errores encontrados y cómo se corrigieron
 
 | # | Qué pasó | Causa técnica | Cómo se corrigió |
 |---|---|---|---|
-| 1 | `DESCRIBE EL ERROR` | `EXPLICA POR QUÉ OCURRIÓ` | `QUÉ LE PEDISTE A GEMINI` |
-| 2 | | | |
+| 1 |La flecha de entrada se encima con el estado inicial. | Ambos elementos se dibujaban en la misma dirección. | Se le pidió a la IA ajustar las coordenadas y la curva del vector.|
+| 2 |Los botones no respondían al dar clic. |El script intentaba leer los elementos antes de que el navegador los dibujara. | Se envolvió la lógica en la función de inicialización.|
 
-## 📁 Estructura
+##  Estructura
 
 ```
 automatalab/
@@ -78,10 +74,10 @@ automatalab/
 └── README.md
 ```
 
-## 🚀 Publicación
+##  Publicación
 
 Publicado con **GitHub Pages** desde la rama `main`, carpeta raíz.
 
-## 💜 Aprendizaje personal
+##  Aprendizaje personal
 
-`ESCRIBE AQUÍ 2 O 3 FRASES SOBRE LO QUE APRENDISTE (vibecoding, prompts, autómatas...)`
+"Aprendí que usar herramientas de IA no es solo pedir código, sino saber estructurar los requerimientos e interpretar los errores. Diseñar las visualizaciones paso a paso me ayudó a reforzar por completo la lógica de las transiciones en los autómatas."
